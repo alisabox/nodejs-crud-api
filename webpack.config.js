@@ -1,7 +1,6 @@
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
+const path = require('path');
 
-export default {
+module.exports = {
   mode: 'development',
   // mode: 'production',
   entry: './index.ts',
@@ -19,7 +18,7 @@ export default {
   },
   output: {
     filename: 'index.js',
-    path: resolve(dirname(fileURLToPath(import.meta.url)), 'dist'),
+    path: path.resolve(__dirname, 'dist'),
   },
   target: 'node',
   devtool: 'inline-source-map',
