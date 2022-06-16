@@ -10,7 +10,7 @@ export const postUserMethod = async(req: IncomingMessage, res: ServerResponse): 
       res.writeHead(201, { 'Content-type': 'application/json' });
       res.end(JSON.stringify(createdUser));
     } else {
-      res.writeHead(400, { 'Content-type': 'application/json' });
+      res.writeHead(400, { 'Content-type': 'text/html' });
       res.end('Invalid Data Format');
     }
   });

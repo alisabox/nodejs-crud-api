@@ -13,16 +13,16 @@ export const putUserMethod = async(req: IncomingMessage, res: ServerResponse, id
           res.writeHead(200, { 'Content-type': 'application/json' });
           res.end(await getUserJSON(id));
         } else {
-          res.writeHead(400, { 'Content-type': 'application/json' });
+          res.writeHead(400, { 'Content-type': 'text/html' });
           res.end('Invalid Data Format');
         }
       } else {
-        res.writeHead(404, { 'Content-type': 'application/json' });
+        res.writeHead(404, { 'Content-type': 'text/html' });
         res.end('User Not Found');
       }
     });
   } else {
-    res.writeHead(400, { 'Content-type': 'application/json' });
+    res.writeHead(400, { 'Content-type': 'text/html' });
     res.end('Invalid UserId');
   }
 }
