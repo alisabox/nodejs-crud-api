@@ -1,99 +1,45 @@
-import http from 'http';
-import { createUser, deleteUser, getUser, getUserJSON, isUUID, Method, updateUser, usersBase } from './src/utils';
+import http, { IncomingMessage, ServerResponse } from 'http';
+import dotenv from 'dotenv';
+import { deleteUserMethod } from './src/methods/delete';
+import { getUserMethod } from './src/methods/get';
+import { postUserMethod } from './src/methods/post';
+import { putUserMethod } from './src/methods/put';
+import { Method } from './src/utils';
 
-const PORT = process.env.PORT || 5000;
+dotenv.config();
 
-const server = http.createServer(async(req, res) => {
+const PORT = process.env.PORT;
+
+export const server = http.createServer(async(req: IncomingMessage, res: ServerResponse) => {
   const baseUrl = '/api/users';
   const id = req.url?.replace(baseUrl, '').substring(1);
-  let body = '';
-  res.writeHead(200, { 'Content-type': 'application/json' });
-  
-  if (req.url?.startsWith(baseUrl)) {
-    if (!id) {
+
+  try {
+    if (req.url === baseUrl || req.url?.startsWith(baseUrl) && id) {
       switch (req.method) {
         case Method.GET:
-          res.end(JSON.stringify(usersBase));
+          await getUserMethod(res, id);
           break;
         case Method.POST:
-          req.on('data', async (chunk) => {
-            body += chunk.toString();
-            const createdUser = await createUser(body);
-            if (createdUser) {
-              res.writeHead(201, { 'Content-type': 'application/json' });
-              res.end(JSON.stringify(createdUser));
-            } else {
-              res.writeHead(400, { 'Content-type': 'application/json' });
-              res.end('Invalid Data Format');
-            }
-          });
+          await postUserMethod(req, res);
+          break;
+        case Method.PUT:
+          await putUserMethod(req, res, id);
+          break;
+        case Method.DELETE:
+          await deleteUserMethod(req, res, id);
           break;
         default:
-          res.end(JSON.stringify(usersBase));
+          await getUserMethod(res);
           break;
       }
     } else {
-      switch (req.method) {
-        case Method.GET:
-          if (isUUID(id)) {
-            const userExists = await getUser(id);
-            if (userExists) {
-              res.end(await getUserJSON(id));
-            } else {
-              res.writeHead(404, { 'Content-type': 'application/json' });
-              res.end('User Not Found');
-            }
-          } else {
-            res.writeHead(400, { 'Content-type': 'application/json' });
-            res.end('Invalid UserId');
-          }
-          break;
-        case Method.PUT:
-          if (isUUID(id)) {
-            req.on('data', async (chunk) => {
-              body += chunk.toString();
-              const userExists = await getUser(id);
-              if (userExists) {
-                const updatedUser = await updateUser(body, id);
-                if (updatedUser) {
-                  res.end(await getUserJSON(id));
-                } else {
-                  res.writeHead(400, { 'Content-type': 'application/json' });
-                  res.end('Invalid Data Format');
-                }
-              } else {
-                res.writeHead(404, { 'Content-type': 'application/json' });
-                res.end('User Not Found');
-              }
-            });
-          } else {
-            res.writeHead(400, { 'Content-type': 'application/json' });
-            res.end('Invalid UserId');
-          }
-          break;
-        case Method.DELETE:
-          if (isUUID(id)) {
-            req.on('data', async (chunk) => {
-              body += chunk.toString();
-              const deletedUser = await deleteUser(id);
-              if (deletedUser) {
-                res.writeHead(204, { 'Content-type': 'application/json' });
-                res.end();
-              } else {
-                res.writeHead(404, { 'Content-type': 'application/json' });
-                res.end('User Not Found');
-              }
-            });
-          } else {
-            res.writeHead(400, { 'Content-type': 'application/json' });
-            res.end('Invalid UserId');
-          }
-          break;
-      }
+      res.writeHead(404, { 'Content-type': 'application/json' });
+      res.end(JSON.stringify({ message: 'Route Not Found' }));
     }
-  } else {
-    res.writeHead(404, { 'Content-type': 'application/json' });
-    res.end(JSON.stringify({ message: 'Route Not Found' }));
+  } catch (err) {
+    res.writeHead(500, { 'Content-type': 'application/json' });
+    res.end(JSON.stringify({ message: 'Internal Server Error' }));
   }
 });
 
