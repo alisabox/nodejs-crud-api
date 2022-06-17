@@ -1,10 +1,12 @@
 import http, { IncomingMessage, ServerResponse } from 'http';
+import cluster from 'cluster';
 import dotenv from 'dotenv';
 import { deleteUserMethod } from './src/methods/delete';
 import { getUserMethod } from './src/methods/get';
 import { postUserMethod } from './src/methods/post';
 import { putUserMethod } from './src/methods/put';
 import { Method } from './src/utils';
+import { env } from 'process';
 
 dotenv.config();
 
@@ -43,4 +45,25 @@ export const server = http.createServer(async(req: IncomingMessage, res: ServerR
   }
 });
 
-server.listen(PORT, () => console.log(`Server started at http://localhost:${PORT}`));
+// Load balancer
+if (env.npm_config_mode === 'multi') {
+  const numCPUs = require('os').cpus().length;
+
+  if (cluster.isPrimary) {
+    console.log(`Master ${process.pid} is running`);
+    
+    for (let i = 0; i < numCPUs; i++) {
+      cluster.fork();
+    }
+    
+    cluster.on('exit', (worker, code, signal) => {
+      console.log(`worker ${worker.process.pid} died`);
+    });
+  } else {
+    server.listen(PORT, () => {
+      console.log(`Worker ${process.pid} started`);
+    });
+  }
+} else {
+  server.listen(PORT, () => console.log(`Server started at http://localhost:${PORT}`));
+}
