@@ -35,6 +35,25 @@ npm run test
 
 ---
 
+The server runs on port `http://localhost:5000/api/users` and allows manipulations with in-memory database of users.
+
+The server accepts:
+
+- GET and POST requests on port `http://localhost:5000/api/users`
+- GET, PUT and DELETE requests on port `http://localhost:5000/api/users/${userId}`
+
+The mandatory fields for POST and PUT operations:
+
+```
+{
+  username: string,
+  age: number,
+  hobbies: string[]
+}
+```
+
+---
+
 The application uses the following packages:
 
 - `nodemon`, `webpack`, `typescript` and their plugins
