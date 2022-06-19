@@ -1,8 +1,7 @@
 const path = require('path');
-const NodemonPlugin = require('nodemon-webpack-plugin');
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: './index.ts',
   module: {
     rules: [
@@ -18,9 +17,8 @@ module.exports = {
   },
   output: {
     filename: 'index.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'prod'),
   },
   target: 'node',
   devtool: 'inline-source-map',
-  plugins: [new NodemonPlugin()],
 };
