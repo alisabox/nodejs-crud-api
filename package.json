@@ -4,11 +4,9 @@
   "description": "Simple CRUD API on vanilla Node.js",
   "main": "index.js",
   "scripts": {
-    "start:dev": "npm-run-all --parallel watch:server watch:build",
-    "start:multi": "npm-run-all --parallel watch:server watch:build --mode=multi",
+    "start:dev": "webpack --watch",
+    "start:multi": "webpack --watch",
     "start:prod": "webpack --config webpack.production.config.js && node prod/index.js",
-    "watch:build": "webpack --watch",
-    "watch:server": "nodemon dist/index.js",
     "test": "jest"
   },
   "author": "Alisa Lobzhanidze",
@@ -21,7 +19,7 @@
     "dotenv": "^16.0.1",
     "jest": "^28.1.1",
     "nodemon": "^2.0.16",
-    "npm-run-all": "^4.1.5",
+    "nodemon-webpack-plugin": "^4.8.0",
     "supertest": "^6.2.3",
     "ts-jest": "^28.0.5",
     "ts-node": "^10.8.1",

@@ -1,4 +1,5 @@
 const path = require('path');
+const NodemonPlugin = require('nodemon-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -21,4 +22,5 @@ module.exports = {
   },
   target: 'node',
   devtool: 'inline-source-map',
+  plugins: [new NodemonPlugin()],
 };

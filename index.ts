@@ -46,7 +46,7 @@ export const server = http.createServer(async(req: IncomingMessage, res: ServerR
 });
 
 // Load balancer
-if (env.npm_config_mode === 'multi') {
+if (env.npm_lifecycle_event === 'start:multi') {
   const numCPUs = require('os').cpus().length;
 
   if (cluster.isPrimary) {
@@ -58,7 +58,9 @@ if (env.npm_config_mode === 'multi') {
     
     cluster.on('exit', (worker, code, signal) => {
       console.log(`worker ${worker.process.pid} died`);
+      cluster.fork();
     });
+
   } else {
     server.listen(PORT, () => {
       console.log(`Worker ${process.pid} started`);
